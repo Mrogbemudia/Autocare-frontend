@@ -36,9 +36,10 @@ export default function Layout() {
 
       {/* The danfo band: the one loud thing on the page. */}
       <header className="border-b-[6px] border-ink bg-danfo">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between px-4 py-3">
-          <Link to="/" onClick={close} className="font-display text-3xl font-extrabold tracking-tight">
-            Kaza
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between px-4 py-3 sm:px-6">
+          <Link to="/" onClick={close} className="inline-flex items-center gap-2.5 font-display text-3xl font-extrabold tracking-tight">
+            <span aria-hidden="true" className="grid size-9 place-items-center rounded-sm bg-ink text-xl text-danfo">K</span>
+            <span>Kaza</span>
           </Link>
           <button
             type="button"
@@ -86,16 +87,17 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="main" className="flex-1">
+      <main id="main" className="min-w-0 flex-1">
         <Suspense fallback={<PageSpinner />}>
           <Outlet />
         </Suspense>
       </main>
 
-      <footer className="border-t border-line bg-white">
-        <p className="mx-auto max-w-6xl px-4 py-5 text-sm text-ink-soft">
-          Kaza connects vehicle owners with repair shops across Nigeria. Payment happens directly with the shop.
-        </p>
+      <footer className="border-t-2 border-ink bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p className="font-semibold">Kaza · clear quotes, approved work.</p>
+          <p className="text-ink-soft">Payment is arranged directly with the repair shop.</p>
+        </div>
       </footer>
     </div>
   )

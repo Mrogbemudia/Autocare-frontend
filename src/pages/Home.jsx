@@ -13,29 +13,46 @@ function ApprovalPreview() {
     <div
       role="img"
       aria-label={`Example: a locked quote of ${formatNaira(6850000)} for brake pads and labour, and a pending extra-work request of ${formatNaira(2400000)} waiting for the owner's approval.`}
-      className="card overflow-hidden border-t-8 border-t-danfo shadow-sm"
+      className="min-w-0 overflow-hidden rounded-lg border-2 border-ink bg-white shadow-[6px_6px_0_#1c1f26]"
     >
+      <div className="flex items-center justify-between gap-4 bg-ink px-5 py-3 text-white">
+        <p className="font-display text-lg font-bold">Repair estimate</p>
+        <span className="rounded-full bg-verified px-3 py-1 text-xs font-bold text-white">Quote accepted</span>
+      </div>
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-semibold">Brake pads and labour</p>
-            <p className="text-sm text-ink-soft">Quote accepted by the owner</p>
+            <p className="font-semibold">Front brake pads</p>
+            <p className="text-sm text-ink-soft">Parts</p>
           </div>
-          <p className="font-display text-xl font-extrabold">{formatNaira(6850000)}</p>
+          <p className="font-semibold">{formatNaira(5200000)}</p>
         </div>
-        <p className="mt-2 inline-block rounded-full bg-verified/10 px-2 py-0.5 text-sm font-semibold text-verified">Price locked</p>
+        <div className="mt-3 flex items-start justify-between gap-4">
+          <div>
+            <p className="font-semibold">Fitting</p>
+            <p className="text-sm text-ink-soft">Labour</p>
+          </div>
+          <p className="font-semibold">{formatNaira(1650000)}</p>
+        </div>
+        <div className="mt-4 flex items-center justify-between border-t-2 border-dashed border-line pt-3">
+          <p className="font-display text-lg font-bold">Agreed total</p>
+          <p className="font-display text-2xl font-extrabold">{formatNaira(6850000)}</p>
+        </div>
+        <p className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-verified">
+          <span aria-hidden="true" className="size-2 rounded-full bg-verified" />
+          This price is locked
+        </p>
       </div>
-      <div className="border-t border-dashed border-line bg-road/60 p-5">
-        <p className="text-sm font-semibold text-alert">Extra work found</p>
-        <div className="mt-1 flex items-start justify-between gap-4">
-          <p>Rear brake disc is warped and needs replacing.</p>
-          <p className="font-display text-xl font-extrabold">+{formatNaira(2400000)}</p>
+      <div className="border-t-2 border-ink bg-road p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-semibold text-alert">New finding · approval needed</p>
+          <span className="rounded-sm bg-white px-2 py-1 text-xs font-semibold text-ink">Not started</span>
         </div>
-        <div className="mt-4 flex gap-2">
-          <span className="rounded-md border border-ink/30 bg-white px-3 py-1.5 text-sm font-semibold">Decline</span>
-          <span className="rounded-md bg-ink px-3 py-1.5 text-sm font-semibold text-white">Approve</span>
+        <div className="mt-2 flex items-start justify-between gap-4">
+          <p className="max-w-sm">The rear brake disc is warped and needs replacing.</p>
+          <p className="shrink-0 font-display text-xl font-extrabold">+{formatNaira(2400000)}</p>
         </div>
-        <p className="mt-3 text-sm text-ink-soft">The shop cannot continue this item until you approve.</p>
+        <p className="mt-4 border-t border-line pt-3 text-sm text-ink-soft">The shop must wait for your approval before continuing.</p>
       </div>
     </div>
   )
@@ -44,12 +61,12 @@ function ApprovalPreview() {
 export default function Home() {
   return (
     <>
-      <section className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:py-20">
-        <div>
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 px-4 py-12 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:items-center md:gap-16 md:py-20">
+        <div className="min-w-0 max-w-2xl">
           <h1 className="text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">Know the price before the work starts.</h1>
           <p className="mt-5 max-w-prose text-lg text-ink-soft">
-            Kaza connects vehicle owners across Nigeria with verified mechanics. Every quote is itemised, and once you
-            accept it, any extra work needs your approval first.
+            Find a verified repair shop, get an itemised quote, and agree on the work before it begins. If the mechanic
+            finds something else, they ask you first.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/shops" className="btn btn-primary">Find a verified shop</Link>
@@ -59,14 +76,14 @@ export default function Home() {
         <ApprovalPreview />
       </section>
 
-      <section className="border-t border-line bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-12">
+      <section className="border-t-2 border-ink bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16">
           <h2 className="text-2xl sm:text-3xl">How a repair works on Kaza</h2>
-          <ol className="mt-8 grid gap-8 md:grid-cols-3">
+          <ol className="mt-8 grid gap-0 md:grid-cols-3">
             {STEPS.map(([title, text], i) => (
-              <li key={title}>
-                <span className="font-display text-4xl font-extrabold text-ink/30" aria-hidden="true">{i + 1}</span>
-                <h3 className="mt-1 text-xl">{title}</h3>
+              <li key={title} className="border-t border-line py-5 md:border-l md:border-t-0 md:px-6 md:py-2 first:md:border-l-0 first:md:pl-0">
+                <span className="grid size-9 place-items-center rounded-sm bg-danfo font-display text-lg font-extrabold" aria-hidden="true">{i + 1}</span>
+                <h3 className="mt-4 text-xl">{title}</h3>
                 <p className="mt-2 max-w-prose text-ink-soft">{text}</p>
               </li>
             ))}
