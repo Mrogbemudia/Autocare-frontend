@@ -9,6 +9,18 @@ The frontend calls the backend at `/api`. During development, Vite proxies these
 from their respective directories. In production, configure the frontend host to proxy `/api` to
 the backend on the same origin so the httpOnly authentication cookies are preserved.
 
+## Repair requests and media
+
+Owners can attach up to five JPEG, PNG, or WebP photos (10 MB each) and one MP4, WebM, or MOV
+video (50 MB) to a repair request. Configure `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
+`CLOUDINARY_API_SECRET` in `backend/.env`; keep these credentials private. Apply backend migrations
+before using the media and repair-plan features.
+
+The shop reviews the request and its media, then sends an itemized quote. The owner can accept or
+reject it. After acceptance and shop confirmation of the appointment, the shop submits inspection
+findings, planned parts and labour, notes, and optional media. The owner must approve that plan
+before the job can move into repair.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

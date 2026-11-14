@@ -1,6 +1,7 @@
 /** The only place the frontend talks to the backend. */
 const BASE = '/api'
 const REQUEST_TIMEOUT_MS = 60_000 // free-tier backends can take ~1 minute to wake
+const MEDIA_UPLOAD_TIMEOUT_MS = 5 * 60_000
 
 // A 401 on these must not trigger a silent refresh.
 const NO_REFRESH = new Set([
@@ -60,14 +61,18 @@ function validationFields(json) {
 
 async function send(path, { method = 'GET', body, params } = {}) {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
+  const timer = setTimeout(
+    () => controller.abort(),
+    isFormData ? MEDIA_UPLOAD_TIMEOUT_MS : REQUEST_TIMEOUT_MS,
+  )
   try {
     const res = await fetch(buildUrl(path, params), {
       method,
       credentials: 'same-origin', // auth cookies stay first-party through the /api proxy
       signal: controller.signal,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
+      headers: body && !isFormData ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
     })
     const json = res.status === 204 ? null : await res.json().catch(() => null)
     if (!res.ok) {
@@ -174,10 +179,33 @@ export const api = {
   },
   requests: {
     list: () => data(request('/service-requests')).then((rows) => rows.map(asRequest)),
-    create: (body) => post('/service-requests', {
-      ...body,
-      location_type: body.location_type === 'shop' ? 'visit_shop' : body.location_type,
-    }),
+    create: (body) => {
+      if (typeof FormData !== 'undefined' && body instanceof FormData) {
+        return data(request('/service-requests', { method: 'POST', body })).then(asRequest)
+      }
+      return post('/service-requests', {
+        ...body,
+        location_type: body.location_type === 'shop' ? 'visit_shop' : body.location_type,
+      }).then(asRequest)
+    },
+    submitQuote: (requestId, body) => post(`/service-requests/${id(requestId)}/quotes`, body),
+  },
+  quotes: {
+    accept: (quoteId, proposedAt) => post(`/quotes/${id(quoteId)}/accept`, { proposed_at: proposedAt }),
+    reject: (quoteId, reason) => post(`/quotes/${id(quoteId)}/reject`, { reason }),
+  },
+  bookings: {
+    confirm: (bookingId) => post(`/bookings/${id(bookingId)}/confirm`, {}),
+    decline: (bookingId, reason) => post(`/bookings/${id(bookingId)}/decline`, { reason }),
+  },
+  workOrders: {
+    list: () => data(request('/work-orders')),
+    submitRepairPlan: (workOrderId, body) => data(request(`/work-orders/${id(workOrderId)}/repair-plans`, {
+      method: 'POST',
+      body,
+    })),
+    reviewRepairPlan: (planId, decision, note) =>
+      post(`/repair-plans/${id(planId)}/${decision}`, { note }),
   },
   admin: {
     shops: (params) => request('/admin/shops', { params }).then((json) => ({

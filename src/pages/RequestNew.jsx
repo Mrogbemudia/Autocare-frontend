@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -13,6 +14,9 @@ export default function RequestNew() {
   const shopId = params.get('shop')
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const [images, setImages] = useState([])
+  const [video, setVideo] = useState(null)
+  const [mediaError, setMediaError] = useState('')
 
   const shopQuery = useQuery({ queryKey: ['shop', shopId], queryFn: () => api.shops.get(shopId), enabled: !!shopId })
   const vehiclesQuery = useQuery({ queryKey: ['vehicles'], queryFn: api.vehicles.list })
@@ -22,7 +26,18 @@ export default function RequestNew() {
     defaultValues: { vehicle_id: '', symptoms: '', urgency: 'standard', location_type: 'shop', service_address: '' },
   })
   const send = useMutation({
-    mutationFn: (body) => api.requests.create({ ...body, shop_id: shopId }),
+    mutationFn: (values) => {
+      const body = new FormData()
+      body.append('vehicleId', values.vehicle_id)
+      body.append('shopId', shopId)
+      body.append('symptoms', values.symptoms)
+      body.append('urgency', values.urgency)
+      body.append('locationType', values.location_type === 'shop' ? 'visit_shop' : values.location_type)
+      if (values.service_address) body.append('serviceAddress', values.service_address)
+      images.forEach((image) => body.append('images', image))
+      if (video) body.append('video', video)
+      return api.requests.create(body)
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['requests'] })
       navigate('/requests')
@@ -59,8 +74,15 @@ export default function RequestNew() {
       <h1 className="text-3xl">Request a quote</h1>
       <p className="mt-1 text-ink-soft">Sending to <strong className="text-ink">{shopQuery.data.business_name}</strong>, {shopQuery.data.city_area}</p>
 
-      <form onSubmit={handleSubmit((v) => send.mutate(v))} noValidate className="card mt-6 space-y-4 p-6">
-        <FormError>{send.error?.message}</FormError>
+      <form
+        onSubmit={handleSubmit((values) => {
+          if (mediaError) return
+          send.mutate(values)
+        })}
+        noValidate
+        className="card mt-6 space-y-4 p-6"
+      >
+        <FormError>{mediaError || send.error?.message}</FormError>
         <Field label="Vehicle" error={errors.vehicle_id?.message}>
           <select {...register('vehicle_id')}>
             <option value="">Choose a vehicle</option>
@@ -83,7 +105,40 @@ export default function RequestNew() {
             <input autoComplete="street-address" {...register('service_address')} />
           </Field>
         )}
-        <button type="submit" className="btn btn-primary w-full" disabled={send.isPending}>{send.isPending ? 'Sending…' : 'Send request'}</button>
+        <Field label="Photos (optional)" hint="JPEG, PNG, or WebP. Up to 5 photos, 10 MB each.">
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={(event) => {
+              const selected = Array.from(event.target.files ?? [])
+              const invalid = selected.length > 5
+                ? 'Attach no more than 5 photos.'
+                : selected.some((file) => file.size > 10 * 1024 * 1024)
+                  ? 'Each photo must be 10 MB or smaller.'
+                  : ''
+              setMediaError(invalid)
+              setImages(invalid ? [] : selected)
+            }}
+          />
+        </Field>
+        {images.length > 0 && <p className="text-sm text-ink-soft">{images.map((image) => image.name).join(', ')}</p>}
+        <Field label="Video (optional)" hint="MP4, WebM, or MOV. One video, up to 50 MB.">
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            onChange={(event) => {
+              const selected = event.target.files?.[0] ?? null
+              const invalid = selected && selected.size > 50 * 1024 * 1024
+                ? 'The video must be 50 MB or smaller.'
+                : ''
+              setMediaError(invalid)
+              setVideo(invalid ? null : selected)
+            }}
+          />
+        </Field>
+        {video && <p className="text-sm text-ink-soft">{video.name}</p>}
+        <button type="submit" className="btn btn-primary w-full" disabled={send.isPending || Boolean(mediaError)}>{send.isPending ? 'Sending…' : 'Send request'}</button>
       </form>
     </div>
   )
