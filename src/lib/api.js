@@ -208,6 +208,7 @@ export const api = {
       post(`/repair-plans/${id(planId)}/${decision}`, { note }),
   },
   admin: {
+    stats: () => data(request('/admin/stats')),
     shops: (params) => request('/admin/shops', { params }).then((json) => ({
       ...json,
       data: fromApi(json?.data ?? []).map(asAdminShop),

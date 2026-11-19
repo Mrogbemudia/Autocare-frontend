@@ -1,0 +1,67 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --k-page: #f1f5f9;
+  --k-card: #ffffff;
+  --k-ink: #0f172a;
+  --k-sub: #334155;
+  --k-line: #64748b;
+  --k-road: #e2e8f0;
+  --k-signal: #eab308;
+  --k-ok: #166534;
+  --k-alert: #b91c1c;
+}
+.dark {
+  color-scheme: dark;
+  --k-page: #0b1220;
+  --k-card: #111827;
+  --k-ink: #f8fafc;
+  --k-sub: #cbd5e1;
+  --k-line: #64748b;
+  --k-road: #1e293b;
+  --k-signal: #facc15;
+  --k-ok: #86efac;
+  --k-alert: #fca5a5;
+}
+
+@theme inline {
+  --color-page: var(--k-page);
+  --color-card: var(--k-card);
+  --color-ink: var(--k-ink);
+  --color-sub: var(--k-sub);
+  --color-line: var(--k-line);
+  --color-signal: var(--k-signal);
+  --color-ok: var(--k-ok);
+  --color-alert: var(--k-alert);
+  --color-road: var(--k-page);
+  --color-ink-soft: var(--k-sub);
+  --color-verified: var(--k-ok);
+}
+@theme {
+  --color-danfo: #facc15;
+  --color-asphalt: #141922; /* text that sits on the yellow, in both modes */
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--k-page);
+  color: var(--k-ink);
+}
+
+@keyframes k-marquee { to { transform: translateX(-50%); } }
+@keyframes k-stamp {
+  0%   { transform: scale(2.2) rotate(-14deg); opacity: 0; }
+  60%  { transform: scale(0.94) rotate(-5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-5deg); opacity: 1; }
+}
+.k-marquee { animation: k-marquee 36s linear infinite; }
+.k-marquee-paused { animation: none; }
+.k-marquee:hover { animation-play-state: paused; }
+.k-stamp { animation: k-stamp 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both; transform: rotate(-5deg); }
+@media (prefers-reduced-motion: reduce) {
+  .k-marquee { animation: none; }
+  .k-stamp { animation: none; }
+}

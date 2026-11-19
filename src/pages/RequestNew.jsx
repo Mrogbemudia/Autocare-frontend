@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api.js'
@@ -21,10 +21,11 @@ export default function RequestNew() {
   const shopQuery = useQuery({ queryKey: ['shop', shopId], queryFn: () => api.shops.get(shopId), enabled: !!shopId })
   const vehiclesQuery = useQuery({ queryKey: ['vehicles'], queryFn: api.vehicles.list })
 
-  const { register, handleSubmit, setError, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, setError, control, formState: { errors } } = useForm({
     resolver: zodResolver(requestSchema),
     defaultValues: { vehicle_id: '', symptoms: '', urgency: 'standard', location_type: 'shop', service_address: '' },
   })
+  const locationType = useWatch({ control, name: 'location_type' })
   const send = useMutation({
     mutationFn: (values) => {
       const body = new FormData()
@@ -100,7 +101,7 @@ export default function RequestNew() {
             <select {...register('location_type')}>{LOCATION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
           </Field>
         </div>
-        {watch('location_type') === 'mobile' && (
+        {locationType === 'mobile' && (
           <Field label="Your address" error={errors.service_address?.message}>
             <input autoComplete="street-address" {...register('service_address')} />
           </Field>

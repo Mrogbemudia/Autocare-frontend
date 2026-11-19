@@ -14,6 +14,7 @@ const RequestNew = lazy(() => import('./pages/RequestNew.jsx'))
 const Requests = lazy(() => import('./pages/Requests.jsx'))
 const ShopDashboard = lazy(() => import('./pages/ShopDashboard.jsx'))
 const AdminShops = lazy(() => import('./pages/AdminShops.jsx'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
         </Route>
 
         <Route element={<RequireAuth roles={['admin']} />}>
+          <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/shops" element={<AdminShops />} />
         </Route>
 

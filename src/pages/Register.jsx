@@ -80,7 +80,7 @@ function ShopForm() {
         <legend className="text-sm font-semibold">Services you offer</legend>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {SERVICE_TYPES.map((s) => (
-            <label key={s.code} className="flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2">
+            <label key={s.code} className="flex items-center gap-2 rounded-md border border-line bg-card px-3 py-2">
               <input type="checkbox" value={s.code} className="size-4 accent-ink" {...register('service_codes')} />
               {s.label}
             </label>

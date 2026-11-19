@@ -71,21 +71,21 @@ function QuoteForm({ request }) {
               <fieldset key={index} className="grid gap-3 rounded-md bg-road p-3 sm:grid-cols-[minmax(0,1fr)_6rem_8rem_auto]">
                 <legend className="px-1 text-sm font-semibold">Part or service {index + 1}</legend>
                 <label className="space-y-1 text-sm">Description
-                  <input className="input bg-white" value={item.description} onChange={(event) => {
+                  <input className="input" value={item.description} onChange={(event) => {
                     const next = [...items]
                     next[index] = { ...item, description: event.target.value }
                     setItems(next)
                   }} required minLength={2} maxLength={200} />
                 </label>
                 <label className="space-y-1 text-sm">Quantity
-                  <input className="input bg-white" type="number" min="1" max="1000" step="1" value={item.quantity} onChange={(event) => {
+                  <input className="input" type="number" min="1" max="1000" step="1" value={item.quantity} onChange={(event) => {
                     const next = [...items]
                     next[index] = { ...item, quantity: event.target.value }
                     setItems(next)
                   }} required />
                 </label>
                 <label className="space-y-1 text-sm">Unit price (NGN)
-                  <input className="input bg-white" type="number" min="0" step="0.01" value={item.price} onChange={(event) => {
+                  <input className="input" type="number" min="0" step="0.01" value={item.price} onChange={(event) => {
                     const next = [...items]
                     next[index] = { ...item, price: event.target.value }
                     setItems(next)

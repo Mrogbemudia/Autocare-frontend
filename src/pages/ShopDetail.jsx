@@ -50,7 +50,7 @@ export default function ShopDetail() {
         <h2 className="mt-8 text-xl">Services</h2>
         <ul className="mt-3 flex flex-wrap gap-2">
           {shop.services?.map((s) => (
-            <li key={s.code ?? s} className="rounded-full bg-white px-3 py-1 text-sm font-semibold ring-1 ring-line">{serviceLabel(s)}</li>
+            <li key={s.code ?? s} className="rounded-full bg-card px-3 py-1 text-sm font-semibold ring-1 ring-line">{serviceLabel(s)}</li>
           ))}
         </ul>
       </article>

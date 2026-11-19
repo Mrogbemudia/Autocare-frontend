@@ -11,6 +11,7 @@ const NAV = {
   ],
   shop: [['/shop', 'My shop']],
   admin: [
+    ['/admin', 'Dashboard'],
     ['/admin/shops', 'Verify shops'],
     ['/shops', 'Browse shops'],
   ],
@@ -30,12 +31,12 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <a href="#main" className="sr-only rounded bg-white px-3 py-2 font-semibold focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50">
+      <a href="#main" className="sr-only rounded bg-card px-3 py-2 font-semibold text-ink focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50">
         Skip to content
       </a>
 
       {/* The danfo band: the one loud thing on the page. */}
-      <header className="border-b-[6px] border-ink bg-danfo">
+      <header className="border-b-[6px] border-slate-950 bg-[#FACC15] text-slate-950">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" onClick={close} className="inline-flex items-center gap-2.5 font-display text-3xl font-extrabold tracking-tight">
             <span aria-hidden="true" className="grid size-9 place-items-center rounded-sm bg-ink text-xl text-danfo">K</span>
@@ -87,13 +88,13 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="main" className="min-w-0 flex-1">
+      <main id="main" className="min-w-0 flex-1 bg-page text-ink">
         <Suspense fallback={<PageSpinner />}>
           <Outlet />
         </Suspense>
       </main>
 
-      <footer className="border-t-2 border-ink bg-white">
+      <footer className="border-t-2 border-line bg-card text-ink">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="font-semibold">Kaza · clear quotes, approved work.</p>
           <p className="text-ink-soft">Payment is arranged directly with the repair shop.</p>
