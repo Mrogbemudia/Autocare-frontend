@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://autocare-backend-syrv.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
