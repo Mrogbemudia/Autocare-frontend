@@ -58,8 +58,10 @@ body {
   100% { transform: scale(1) rotate(-5deg); opacity: 1; }
 }
 .k-marquee { animation: k-marquee 36s linear infinite; }
-.k-marquee-paused { animation: none; }
-.k-marquee:hover { animation-play-state: paused; }
+.k-marquee-paused,
+.k-marquee:hover,
+.k-marquee:active,
+.k-marquee:focus-within { animation-play-state: paused; }
 .k-stamp { animation: k-stamp 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both; transform: rotate(-5deg); }
 @media (prefers-reduced-motion: reduce) {
   .k-marquee { animation: none; }

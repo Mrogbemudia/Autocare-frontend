@@ -79,7 +79,11 @@ export default function Layout() {
                   <Link to="/login" onClick={close} className="font-semibold underline-offset-[6px] hover:underline">
                     Log in
                   </Link>
-                  <Link to="/register" onClick={close} className="btn btn-primary btn-sm">
+                  <Link
+                    to="/register"
+                    onClick={close}
+                    className="btn btn-sm bg-white text-[#0F172A] hover:bg-slate-100 focus-visible:outline-[#0F172A] focus-visible:ring-2 focus-visible:ring-[#0F172A] focus-visible:ring-offset-2"
+                  >
                     Sign up
                   </Link>
                 </div>

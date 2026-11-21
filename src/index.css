@@ -37,7 +37,7 @@
     @apply min-h-9 px-3 py-1.5 text-sm;
   }
   .btn-primary {
-    @apply bg-ink text-white hover:bg-black;
+    @apply bg-[#0F172A] text-white hover:bg-[#1E293B];
   }
   .btn-secondary {
     @apply border border-ink/50 bg-card text-ink hover:border-ink;

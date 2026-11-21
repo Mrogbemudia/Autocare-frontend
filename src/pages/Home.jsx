@@ -147,6 +147,7 @@ const TAGS = ['Mobile mechanics', 'Heavy towing', 'Tyre specialists', 'EV techni
   'Cars', 'SUVs', 'Buses', 'Trucks', 'Motorcycles', 'Tricycles'];
 
 function Marquee({ paused }) {
+  const [pointerPaused, setPointerPaused] = useState(false);
   const row = (hidden) => (
     <ul className="flex shrink-0 gap-3 pr-3" aria-hidden={hidden || undefined}>
       {TAGS.map((t) => (
@@ -156,7 +157,15 @@ function Marquee({ paused }) {
   );
   return (
     <div className="overflow-hidden border-y-2 border-line bg-page py-4 [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
-      <div className={`${paused ? 'k-marquee-paused' : 'k-marquee'} flex w-max`}>{row(false)}{row(true)}</div>
+      <div
+        className={`k-marquee ${paused || pointerPaused ? 'k-marquee-paused' : ''} flex w-max`}
+        onPointerDown={() => setPointerPaused(true)}
+        onPointerUp={() => setPointerPaused(false)}
+        onPointerCancel={() => setPointerPaused(false)}
+        onPointerLeave={() => setPointerPaused(false)}
+      >
+        {row(false)}{row(true)}
+      </div>
     </div>
   );
 }

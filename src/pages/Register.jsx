@@ -39,7 +39,11 @@ function OwnerForm() {
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="card space-y-4 p-6">
       <FormError>{signup.error?.message}</FormError>
       <AccountFields register={register} errors={errors} />
-      <button type="submit" className="btn btn-primary w-full" disabled={signup.isPending}>
+      <button
+        type="submit"
+        className="btn w-full bg-[#FACC15] text-[#0F172A] hover:bg-[#EAB308] focus-visible:outline-[#0F172A] focus-visible:ring-2 focus-visible:ring-[#0F172A] focus-visible:ring-offset-2"
+        disabled={signup.isPending}
+      >
         {signup.isPending ? 'Creating account…' : 'Create account'}
       </button>
     </form>
@@ -91,7 +95,11 @@ function ShopForm() {
       <Field label="Certifications and experience" hint="Optional. An admin reads this when verifying your shop." error={errors.certification_notes?.message}>
         <textarea rows={4} {...register('certification_notes')} />
       </Field>
-      <button type="submit" className="btn btn-primary w-full" disabled={signup.isPending}>
+      <button
+        type="submit"
+        className="btn w-full bg-[#FACC15] text-[#0F172A] hover:bg-[#EAB308] focus-visible:outline-[#0F172A] focus-visible:ring-2 focus-visible:ring-[#0F172A] focus-visible:ring-offset-2"
+        disabled={signup.isPending}
+      >
         {signup.isPending ? 'Creating account…' : 'Register my shop'}
       </button>
       <p className="text-sm text-ink-soft">Your shop stays hidden until an admin verifies it.</p>
@@ -107,7 +115,11 @@ export default function Register() {
       type="button"
       aria-pressed={role === value}
       onClick={() => setParams({ role: value })}
-      className={`btn flex-1 ${role === value ? 'btn-primary' : 'btn-secondary'}`}
+      className={`btn flex-1 focus-visible:outline-[#0F172A] focus-visible:ring-2 focus-visible:ring-[#0F172A] focus-visible:ring-offset-2 ${
+        role === value
+          ? 'bg-[#FACC15] text-[#0F172A] hover:bg-[#EAB308]'
+          : 'btn-secondary'
+      }`}
     >
       {label}
     </button>
