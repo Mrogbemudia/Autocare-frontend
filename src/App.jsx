@@ -16,6 +16,10 @@ const ShopDashboard = lazy(() => import('./pages/ShopDashboard.jsx'))
 const AdminShops = lazy(() => import('./pages/AdminShops.jsx'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'))
 const WorkOrders = lazy(() => import('./pages/WorkOrders.jsx'))
+const TechnicianDashboard = lazy(() => import('./pages/TechnicianDashboard.jsx'))
+const PartsShopDashboard = lazy(() => import('./pages/PartsShopDashboard.jsx'))
+const PartsMarketplace = lazy(() => import('./pages/PartsMarketplace.jsx'))
+const ClientDashboard = lazy(() => import('./pages/ClientDashboard.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 export default function App() {
@@ -37,12 +41,21 @@ export default function App() {
           <Route path="requests/new" element={<RequestNew />} />
           <Route path="work-orders" element={<WorkOrders />} />
           <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
+          <Route path="parts" element={<PartsMarketplace />} />
+          <Route path="maintenance" element={<ClientDashboard />} />
         </Route>
 
         <Route element={<RequireAuth roles={['shop']} />}>
           <Route path="shop" element={<ShopDashboard />} />
           <Route path="work-orders" element={<WorkOrders />} />
           <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
+          <Route path="technician" element={<TechnicianDashboard />} />
+          <Route path="parts" element={<PartsMarketplace />} />
+        </Route>
+
+        <Route element={<RequireAuth roles={['parts_shop']} />}>
+          <Route path="parts-shop" element={<PartsShopDashboard />} />
+          <Route path="parts" element={<PartsMarketplace />} />
         </Route>
 
         <Route element={<RequireAuth roles={['admin']} />}>

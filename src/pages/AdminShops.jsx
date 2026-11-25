@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api.js'
 import { serviceLabel } from '../lib/constants.js'
-import { formatDateTime, formatPhone } from '../lib/format.js'
+import { formatDateTime } from '../lib/format.js'
 import { EmptyState, ErrorState, FormError, PageSpinner } from '../components/ui.jsx'
 
 const TABS = [
@@ -29,7 +29,7 @@ function ReviewCard({ shop }) {
       <h2 className="text-xl">{shop.business_name}</h2>
       <p className="text-ink-soft">{shop.city_area}, {shop.state}. {shop.address}</p>
       {shop.owner && (
-        <p className="mt-2 text-sm">{shop.owner.full_name}, {shop.owner.email}, {formatPhone(shop.owner.phone)}</p>
+        <p className="mt-2 text-sm">{shop.owner.full_name}</p>
       )}
       <p className="mt-2 text-sm text-ink-soft">Services: {shop.services?.map(serviceLabel).join(', ') || 'none listed'}. Registered {formatDateTime(shop.created_at)}.</p>
       <div className="mt-3 rounded-md bg-road p-3 text-sm">

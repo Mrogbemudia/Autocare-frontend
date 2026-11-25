@@ -2,7 +2,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api.js'
 import { useMe } from '../lib/auth.js'
-import { formatPhone, mapsLink } from '../lib/format.js'
+import { mapsLink } from '../lib/format.js'
 import { serviceLabel } from '../lib/constants.js'
 import { EmptyState, ErrorState, PageSpinner, VerifiedBadge } from '../components/ui.jsx'
 
@@ -71,14 +71,8 @@ export default function ShopDetail() {
           </div>
         )}
         <div>
-          <h2 className="text-base">Phone</h2>
-          {shop.phone ? (
-            <a className="mt-1 inline-block font-semibold underline underline-offset-4" href={`tel:${shop.phone}`}>{formatPhone(shop.phone)}</a>
-          ) : (
-            <p className="mt-1 text-ink-soft">
-              <Link to="/login" state={{ from: location }} className="font-semibold underline underline-offset-4">Log in</Link> to see the phone number.
-            </p>
-          )}
+          <h2 className="text-base">Contact</h2>
+          <p className="mt-1 text-ink-soft">Use in-app calls to protect your privacy.</p>
         </div>
         <p className="text-sm text-ink-soft">
           {shop.avg_rating ? `Rated ${Number(shop.avg_rating).toFixed(1)} out of 5` : 'No reviews yet'}

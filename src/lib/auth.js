@@ -4,7 +4,7 @@ import { api } from './api.js'
 export const ME_KEY = ['me']
 
 export const homeFor = (role) =>
-  ({ owner: '/shops', shop: '/shop', admin: '/admin/shops' })[role] ?? '/'
+  ({ owner: '/shops', shop: '/shop', admin: '/admin/shops', parts_shop: '/parts-shop' })[role] ?? '/'
 
 // The current user, or null for a guest. A 401 is a normal answer here, not an error.
 export function useMe() {
@@ -37,7 +37,9 @@ export function useRegister(kind) {
     mutationFn: async (values) => {
       const body = { ...values }
       delete body.confirm_password
-      return kind === 'shop' ? api.auth.registerShop(body) : api.auth.registerOwner(body)
+      if (kind === 'shop') return api.auth.registerShop(body)
+      if (kind === 'parts_shop') return api.auth.registerPartsShop(body)
+      return api.auth.registerOwner(body)
     },
     onSuccess: (user) => qc.setQueryData(ME_KEY, user),
   })

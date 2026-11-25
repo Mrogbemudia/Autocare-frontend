@@ -2,6 +2,7 @@ import { Suspense, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useLogout, useMe } from '../lib/auth.js'
 import { PageSpinner } from './ui.jsx'
+import CallCenter from './CallCenter.jsx'
 
 const NAV = {
   owner: [
@@ -9,10 +10,18 @@ const NAV = {
     ['/garage', 'My garage'],
     ['/requests', 'My requests'],
     ['/work-orders', 'Work orders'],
+    ['/parts', 'Parts'],
+    ['/maintenance', 'Maintenance'],
   ],
   shop: [
     ['/shop', 'My shop'],
+    ['/technician', 'Technician'],
     ['/work-orders', 'Work orders'],
+    ['/parts', 'Parts'],
+  ],
+  parts_shop: [
+    ['/parts-shop', 'Parts shop'],
+    ['/parts', 'Marketplace'],
   ],
   admin: [
     ['/admin', 'Dashboard'],
@@ -109,6 +118,7 @@ export default function Layout() {
           <p className="text-ink-soft">Payment is arranged directly with the repair shop.</p>
         </div>
       </footer>
+      <CallCenter />
     </div>
   )
 }

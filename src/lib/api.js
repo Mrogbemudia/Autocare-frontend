@@ -123,7 +123,11 @@ const patch = (path, body) => data(request(path, { method: 'PATCH', body: toApi(
 const id = encodeURIComponent
 
 function asUser(result) {
-  return result?.user ? { ...result.user, ...(result.shop ? { shop: result.shop } : {}) } : null
+  return result?.user ? {
+    ...result.user,
+    ...(result.shop ? { shop: result.shop } : {}),
+    ...(result.partsShop ? { partsShop: result.partsShop } : {}),
+  } : null
 }
 
 function asRequest(row) {
@@ -148,7 +152,6 @@ function asAdminShop(shop) {
     owner: {
       full_name: shop.owner_name,
       email: shop.email,
-      phone: shop.phone,
     },
   }
 }
@@ -159,6 +162,7 @@ export const api = {
     login: async (body) => asUser(await post('/auth/login', body)),
     registerOwner: async (body) => asUser(await post('/auth/register/owner', body)),
     registerShop: async (body) => asUser(await post('/auth/register/shop', body)),
+    registerPartsShop: async (body) => asUser(await post('/auth/register/parts-shop', body)),
     logout: () => request('/auth/logout', { method: 'POST' }),
   },
   shops: {
@@ -234,5 +238,63 @@ export const api = {
       const action = { verified: 'verify', rejected: 'reject', suspended: 'suspend' }[status]
       return post(`/admin/shops/${id(shopId)}/${action}`, { note })
     },
+  },
+
+  technician: {
+    dashboard: () => data(request('/technician/dashboard')),
+  },
+  grading: {
+    status: () => data(request('/grading/status')),
+    start: (body) => data(request('/grading/attempts', { method: 'POST', body: toApi(body) })),
+    submit: (attemptId, answers) =>
+      post(`/grading/attempts/${id(attemptId)}/submit`, { answers }),
+  },
+  interviews: {
+    list: () => data(request('/interviews')),
+    request: (body) => post('/interviews', body),
+  },
+  documents: {
+    submit: (ownerType, body) => data(request(`/verification-documents/${id(ownerType)}`, { method: 'POST', body })),
+  },
+  partsShop: {
+    dashboard: () => data(request('/parts-shop/dashboard')),
+    update: (body) => patch('/parts-shop/me', body),
+    orders: () => data(request('/parts-shop/orders')),
+  },
+  parts: {
+    list: (params) => request('/parts', { params }).then((json) => ({ ...json, data: fromApi(json?.data ?? []) })),
+    save: (partId, body, image) => {
+      const form = new FormData()
+      Object.entries(body).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) form.append(key, String(value))
+      })
+      if (image) form.append('image', image)
+      return data(request(partId ? `/parts/${id(partId)}` : '/parts', { method: partId ? 'PATCH' : 'POST', body: form }))
+    },
+    checkout: (body) => post('/parts/orders', body),
+    orders: () => data(request('/parts/orders')),
+    order: (orderId) => data(request(`/parts/orders/${id(orderId)}`)),
+    vendorUpdateStatus: (orderId, body) =>
+      patch(`/parts-shop/orders/${id(orderId)}/status`, body),
+    paystack: (orderId) => post(`/parts/orders/${id(orderId)}/paystack`, {}),
+    verifyPaystack: (reference) => post(`/parts/payments/paystack/verify/${id(reference)}`, {}),
+    bankTransfer: (orderId) => post(`/parts/orders/${id(orderId)}/bank-transfer`, {}),
+  },
+  maintenance: {
+    get: () => data(request('/maintenance')),
+    setRule: (body) => post('/maintenance/rules', body),
+    setReminders: (body) => post('/reminders', body),
+  },
+  insurance: {
+    products: () => data(request('/insurance/products')),
+    apply: (body) => post('/insurance/requests', body),
+    list: () => data(request('/insurance/requests')),
+  },
+  calls: {
+    create: (body) => post('/calls', body),
+    incoming: () => data(request('/calls/incoming')),
+    update: (callId, status) => patch(`/calls/${id(callId)}/status`, { status }),
+    signal: (callId, kind, payload) => post(`/calls/${id(callId)}/signals`, { kind, payload }),
+    signals: (callId, after) => data(request(`/calls/${id(callId)}/signals`, { params: after ? { after } : {} })),
   },
 }

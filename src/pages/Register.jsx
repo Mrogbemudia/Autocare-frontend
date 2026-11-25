@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -6,6 +7,40 @@ import { applyFieldErrors } from '../lib/forms.js'
 import { NIGERIAN_STATES, SERVICE_TYPES } from '../lib/constants.js'
 import { ownerRegisterSchema, shopRegisterSchema } from '../lib/schemas.js'
 import { Field, FormError } from '../components/ui.jsx'
+
+function PartsShopForm() {
+  const signup = useRegister('parts_shop')
+  const [values,setValues] = useState({
+    full_name:'',email:'',phone:'',password:'',confirm_password:'',
+    business_name:'',state:'',city_area:'',address:'',description:'',
+    offers_pickup:true,offers_delivery:false,delivery_fee_kobo:0,
+  })
+  const [error,setError] = useState('')
+  const update=(key,value)=>setValues((old)=>({...old,[key]:value}))
+  return (
+    <form onSubmit={(event)=>{event.preventDefault(); if(values.password!==values.confirm_password){setError('Passwords do not match');return;} setError(''); signup.mutate(values,{onError:(err)=>setError(err.message)})}} className="card space-y-4 p-6">
+      <FormError>{error||signup.error?.message}</FormError>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Full name"><input value={values.full_name} onChange={(e)=>update('full_name',e.target.value)} /></Field>
+        <Field label="Email"><input type="email" value={values.email} onChange={(e)=>update('email',e.target.value)} /></Field>
+        <Field label="Phone number" hint="Used only for account security"><input type="tel" value={values.phone} onChange={(e)=>update('phone',e.target.value)} /></Field>
+        <Field label="Business name"><input value={values.business_name} onChange={(e)=>update('business_name',e.target.value)} /></Field>
+        <Field label="Password"><input type="password" value={values.password} onChange={(e)=>update('password',e.target.value)} /></Field>
+        <Field label="Confirm password"><input type="password" value={values.confirm_password} onChange={(e)=>update('confirm_password',e.target.value)} /></Field>
+        <Field label="State"><select value={values.state} onChange={(e)=>update('state',e.target.value)}><option value="">Choose state</option>{NIGERIAN_STATES.map((state)=><option key={state}>{state}</option>)}</select></Field>
+        <Field label="City or area"><input value={values.city_area} onChange={(e)=>update('city_area',e.target.value)} /></Field>
+      </div>
+      <Field label="Business address"><input value={values.address} onChange={(e)=>update('address',e.target.value)} /></Field>
+      <Field label="Description"><textarea rows="3" value={values.description} onChange={(e)=>update('description',e.target.value)} /></Field>
+      <div className="flex flex-wrap gap-4 text-sm">
+        <label><input type="checkbox" checked={values.offers_pickup} onChange={(e)=>update('offers_pickup',e.target.checked)} /> Offers pickup</label>
+        <label><input type="checkbox" checked={values.offers_delivery} onChange={(e)=>update('offers_delivery',e.target.checked)} /> Offers delivery</label>
+      </div>
+      {values.offers_delivery&&<Field label="Delivery fee (kobo)"><input type="number" min="0" value={values.delivery_fee_kobo} onChange={(e)=>update('delivery_fee_kobo',Number(e.target.value))} /></Field>}
+      <button type="submit" className="btn w-full bg-[#FACC15] text-[#0F172A]" disabled={signup.isPending}>{signup.isPending?'Creating account…':'Register parts shop'}</button>
+    </form>
+  )
+}
 
 function AccountFields({ register, errors }) {
   return (
@@ -109,7 +144,8 @@ function ShopForm() {
 
 export default function Register() {
   const [params, setParams] = useSearchParams()
-  const role = params.get('role') === 'shop' ? 'shop' : 'owner'
+  const requestedRole = params.get('role')
+  const role = requestedRole === 'shop' || requestedRole === 'parts_shop' ? requestedRole : 'owner'
   const tab = (value, label) => (
     <button
       type="button"
@@ -130,8 +166,11 @@ export default function Register() {
       <div className="mt-6 flex gap-2" role="group" aria-label="Account type">
         {tab('owner', 'I own a vehicle')}
         {tab('shop', 'I run a repair shop')}
+        {tab('parts_shop', 'I run a parts shop')}
       </div>
-      <div className="mt-4">{role === 'shop' ? <ShopForm key="shop" /> : <OwnerForm key="owner" />}</div>
+      <div className="mt-4">
+        {role === 'shop' ? <ShopForm key="shop" /> : role === 'parts_shop' ? <PartsShopForm key="parts_shop" /> : <OwnerForm key="owner" />}
+      </div>
       <p className="mt-4 text-ink-soft">
         Already registered? <Link to="/login" className="font-semibold text-ink underline underline-offset-4">Log in</Link>
       </p>
