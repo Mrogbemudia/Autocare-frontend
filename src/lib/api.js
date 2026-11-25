@@ -170,15 +170,23 @@ export const api = {
     },
     get: (shopId) => data(request(`/shops/${id(shopId)}`)),
     mine: () => data(request('/shops/me')),
+    serviceTypes: () => data(request('/shops/service-types')),
+    updateMine: (body) => patch('/shops/me', body),
   },
   vehicles: {
     list: () => data(request('/vehicles')),
+    get: (vehicleId) => data(request(`/vehicles/${id(vehicleId)}`)),
     create: (body) => post('/vehicles', body),
     update: (vehicleId, body) => patch(`/vehicles/${id(vehicleId)}`, body),
     remove: (vehicleId) => request(`/vehicles/${id(vehicleId)}`, { method: 'DELETE' }),
   },
   requests: {
     list: () => data(request('/service-requests')).then((rows) => rows.map(asRequest)),
+    get: (requestId) => data(request(`/service-requests/${id(requestId)}`)).then(asRequest),
+    cancel: (requestId) => post(`/service-requests/${id(requestId)}/cancel`, {}),
+    listQuotes: (requestId) => data(request(`/service-requests/${id(requestId)}/quotes`)),
+    proposeBooking: (requestId, proposedAt) =>
+      post(`/service-requests/${id(requestId)}/bookings`, { proposed_at: proposedAt }),
     create: (body) => {
       if (typeof FormData !== 'undefined' && body instanceof FormData) {
         return data(request('/service-requests', { method: 'POST', body })).then(asRequest)
@@ -200,6 +208,15 @@ export const api = {
   },
   workOrders: {
     list: () => data(request('/work-orders')),
+    get: (workOrderId) => data(request(`/work-orders/${id(workOrderId)}`)),
+    changeStatus: (workOrderId, body) =>
+      patch(`/work-orders/${id(workOrderId)}/status`, body),
+    raiseExtraWork: (workOrderId, body) =>
+      post(`/work-orders/${id(workOrderId)}/extra-work`, body),
+    approveExtraWork: (extraWorkId, note) =>
+      post(`/extra-work/${id(extraWorkId)}/approve`, { note }),
+    declineExtraWork: (extraWorkId, note) =>
+      post(`/extra-work/${id(extraWorkId)}/decline`, { note }),
     submitRepairPlan: (workOrderId, body) => data(request(`/work-orders/${id(workOrderId)}/repair-plans`, {
       method: 'POST',
       body,

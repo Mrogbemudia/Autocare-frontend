@@ -15,6 +15,7 @@ const Requests = lazy(() => import('./pages/Requests.jsx'))
 const ShopDashboard = lazy(() => import('./pages/ShopDashboard.jsx'))
 const AdminShops = lazy(() => import('./pages/AdminShops.jsx'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'))
+const WorkOrders = lazy(() => import('./pages/WorkOrders.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 export default function App() {
@@ -34,15 +35,21 @@ export default function App() {
           <Route path="garage" element={<Garage />} />
           <Route path="requests" element={<Requests />} />
           <Route path="requests/new" element={<RequestNew />} />
+          <Route path="work-orders" element={<WorkOrders />} />
+          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
         </Route>
 
         <Route element={<RequireAuth roles={['shop']} />}>
           <Route path="shop" element={<ShopDashboard />} />
+          <Route path="work-orders" element={<WorkOrders />} />
+          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
         </Route>
 
         <Route element={<RequireAuth roles={['admin']} />}>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/shops" element={<AdminShops />} />
+          <Route path="work-orders" element={<WorkOrders />} />
+          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

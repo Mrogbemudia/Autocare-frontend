@@ -8,11 +8,16 @@ const NAV = {
     ['/shops', 'Find a shop'],
     ['/garage', 'My garage'],
     ['/requests', 'My requests'],
+    ['/work-orders', 'Work orders'],
   ],
-  shop: [['/shop', 'My shop']],
+  shop: [
+    ['/shop', 'My shop'],
+    ['/work-orders', 'Work orders'],
+  ],
   admin: [
     ['/admin', 'Dashboard'],
     ['/admin/shops', 'Verify shops'],
+    ['/work-orders', 'Work orders'],
     ['/shops', 'Browse shops'],
   ],
 }
