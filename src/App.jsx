@@ -42,35 +42,32 @@ export default function App() {
           <Route path="garage" element={<Garage />} />
           <Route path="requests" element={<Requests />} />
           <Route path="requests/new" element={<RequestNew />} />
-          <Route path="work-orders" element={<WorkOrders />} />
-          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
+          <Route path="maintenance" element={<ClientDashboard />} />
+        </Route>
+
+        <Route element={<RequireAuth roles={['owner', 'shop', 'parts_shop']} />}>
           <Route path="parts" element={<PartsMarketplace />} />
           <Route path="parts/orders/:orderId" element={<PartsOrderDetail />} />
-          <Route path="maintenance" element={<ClientDashboard />} />
+        </Route>
+
+        <Route element={<RequireAuth roles={['owner', 'shop', 'admin']} />}>
+          <Route path="work-orders" element={<WorkOrders />} />
+          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
         </Route>
 
         <Route element={<RequireAuth roles={['shop']} />}>
           <Route path="shop" element={<ShopDashboard />} />
-          <Route path="work-orders" element={<WorkOrders />} />
-          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
           <Route path="technician" element={<TechnicianDashboard />} />
-          <Route path="parts" element={<PartsMarketplace />} />
-          <Route path="parts/orders/:orderId" element={<PartsOrderDetail />} />
-          <Route path="parts-shop" element={<PartsShopDashboard />} />
         </Route>
 
-        <Route element={<RequireAuth roles={['parts_shop']} />}>
+        <Route element={<RequireAuth roles={['shop', 'parts_shop']} />}>
           <Route path="parts-shop" element={<PartsShopDashboard />} />
-          <Route path="parts" element={<PartsMarketplace />} />
-          <Route path="parts/orders/:orderId" element={<PartsOrderDetail />} />
         </Route>
 
         <Route element={<RequireAuth roles={['admin']} />}>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/shops" element={<AdminShops />} />
           <Route path="admin/parts-shops" element={<AdminPartsShops />} />
-          <Route path="work-orders" element={<WorkOrders />} />
-          <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
         </Route>
 
         <Route element={<RequireAuth roles={['admin','support']} />}>

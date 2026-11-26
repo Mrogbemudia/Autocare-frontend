@@ -26,6 +26,7 @@ const NAV = {
   admin: [
     ['/admin', 'Dashboard'],
     ['/admin/shops', 'Verify shops'],
+    ['/admin/interviews', 'Interview queue'],
     ['/work-orders', 'Work orders'],
     ['/shops', 'Browse shops'],
   ],

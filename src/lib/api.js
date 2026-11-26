@@ -8,6 +8,7 @@ const NO_REFRESH = new Set([
   '/auth/login',
   '/auth/register/owner',
   '/auth/register/shop',
+  '/auth/register/parts-shop',
   '/auth/refresh',
   '/auth/logout',
 ])
@@ -123,10 +124,11 @@ const patch = (path, body) => data(request(path, { method: 'PATCH', body: toApi(
 const id = encodeURIComponent
 
 function asUser(result) {
+  const partsShop = result?.parts_shop ?? result?.partsShop
   return result?.user ? {
     ...result.user,
     ...(result.shop ? { shop: result.shop } : {}),
-    ...(result.partsShop ? { partsShop: result.partsShop } : {}),
+    ...(partsShop ? { partsShop } : {}),
   } : null
 }
 

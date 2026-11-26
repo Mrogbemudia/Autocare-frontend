@@ -4,7 +4,7 @@ import { api } from './api.js'
 export const ME_KEY = ['me']
 
 export const homeFor = (role) =>
-  ({ owner: '/shops', shop: '/shop', admin: '/admin/shops', parts_shop: '/parts-shop' })[role] ?? '/'
+  ({ owner: '/shops', shop: '/shop', admin: '/admin/shops', support: '/admin/interviews', parts_shop: '/parts-shop' })[role] ?? '/'
 
 // The current user, or null for a guest. A 401 is a normal answer here, not an error.
 export function useMe() {
