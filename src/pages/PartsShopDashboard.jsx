@@ -72,9 +72,34 @@ export default function PartsShopDashboard() {
     )
   }
 
-  if (dashboard.isPending) return <PageSpinner />
-  if (dashboard.error) return <ErrorState error={dashboard.error} onRetry={dashboard.refetch} />
+  if (dashboard.isPending) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <h1 className="text-3xl">Parts seller dashboard</h1>
+        <PageSpinner />
+      </div>
+    )
+  }
+  if (dashboard.error) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
+        <h1 className="text-3xl">Parts seller dashboard</h1>
+        <ErrorState error={dashboard.error} onRetry={dashboard.refetch} />
+      </div>
+    )
+  }
   const data = dashboard.data
+  if (!data?.shop || !data.orders || !Array.isArray(data.parts)) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
+        <h1 className="text-3xl">Parts seller dashboard</h1>
+        <ErrorState
+          error={{ message: 'The server returned incomplete parts shop data. Please retry or contact support.' }}
+          onRetry={dashboard.refetch}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
