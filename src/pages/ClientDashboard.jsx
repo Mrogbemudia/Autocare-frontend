@@ -25,6 +25,7 @@ export default function ClientDashboard() {
   })
   const reminders=useMutation({
     mutationFn:()=>api.maintenance.setReminders({maintenanceLeadDays:Number(leadDays),maintenanceLeadKm:Number(leadKm),documentLeadDays:Number(docLeadDays),inAppEnabled:true}),
+    onSuccess:()=>qc.invalidateQueries({queryKey:['maintenance']}),
   })
   const apply=useMutation({
     mutationFn:()=>api.insurance.apply({vehicleId:insuranceVehicle,productId,ownerNote}),
@@ -56,7 +57,13 @@ export default function ClientDashboard() {
           <label className="text-sm font-semibold">Document days before<input className="input mt-1.5 font-normal" type="number" min="0" max="180" value={docLeadDays} onChange={(e)=>setDocLeadDays(e.target.value)} /></label>
         </div>
         <button type="button" className="btn btn-secondary mt-4" disabled={reminders.isPending} onClick={()=>reminders.mutate()}>{reminders.isPending?'Saving…':'Save reminder settings'}</button>
-        {data.upcoming.length>0&&<div className="mt-5"><h3 className="font-semibold">Configured schedules</h3><ul className="mt-2 space-y-2">{data.upcoming.map((item)=><li key={`${item.vehicle_id}-${item.template_id}`} className="rounded bg-road p-3 text-sm"><strong>{item.make} {item.model}</strong> · {item.label} · every {item.interval_km?`${item.interval_km} km`:''}{item.interval_km&&item.interval_months?' or ':''}{item.interval_months?`${item.interval_months} months`:''}</li>)}</ul></div>}
+        {data.upcoming.length>0&&<div className="mt-5"><h3 className="font-semibold">Next maintenance reminders</h3><ul className="mt-2 space-y-2">{data.upcoming.map((item)=>{
+          const daysUntil=item.days_until_due==null?null:Number(item.days_until_due)
+          const kmUntil=item.next_service_mileage==null?null:Number(item.next_service_mileage)-Number(item.mileage_km??0)
+          const dueSoon=(daysUntil!==null&&daysUntil<=Number(data.settings.maintenance_lead_days??14))
+            ||(kmUntil!==null&&kmUntil<=Number(data.settings.maintenance_lead_km??500))
+          return <li key={`${item.vehicle_id}-${item.template_id}`} className="rounded bg-road p-3 text-sm"><strong>{item.make} {item.model}</strong> · {item.label}<p className="mt-1">{item.next_service_date?`Next date: ${new Date(`${item.next_service_date}T00:00:00`).toLocaleDateString()}`:'No time interval set'}{item.next_service_mileage!=null?` · At ${Number(item.next_service_mileage).toLocaleString()} km`:''}</p>{dueSoon&&<p className="mt-1 font-semibold text-alert">Due soon based on your reminder settings.</p>}</li>
+        })}</ul></div>}
       </section>
 
       <section className="card p-5">

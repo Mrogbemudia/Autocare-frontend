@@ -14,11 +14,14 @@ const RequestNew = lazy(() => import('./pages/RequestNew.jsx'))
 const Requests = lazy(() => import('./pages/Requests.jsx'))
 const ShopDashboard = lazy(() => import('./pages/ShopDashboard.jsx'))
 const AdminShops = lazy(() => import('./pages/AdminShops.jsx'))
+const AdminPartsShops = lazy(() => import('./pages/AdminPartsShops.jsx'))
+const InterviewQueue = lazy(() => import('./pages/InterviewQueue.jsx'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'))
 const WorkOrders = lazy(() => import('./pages/WorkOrders.jsx'))
 const TechnicianDashboard = lazy(() => import('./pages/TechnicianDashboard.jsx'))
 const PartsShopDashboard = lazy(() => import('./pages/PartsShopDashboard.jsx'))
 const PartsMarketplace = lazy(() => import('./pages/PartsMarketplace.jsx'))
+const PartsOrderDetail = lazy(() => import('./pages/PartsOrderDetail.jsx'))
 const ClientDashboard = lazy(() => import('./pages/ClientDashboard.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
@@ -42,6 +45,7 @@ export default function App() {
           <Route path="work-orders" element={<WorkOrders />} />
           <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
           <Route path="parts" element={<PartsMarketplace />} />
+          <Route path="parts/orders/:orderId" element={<PartsOrderDetail />} />
           <Route path="maintenance" element={<ClientDashboard />} />
         </Route>
 
@@ -51,18 +55,26 @@ export default function App() {
           <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
           <Route path="technician" element={<TechnicianDashboard />} />
           <Route path="parts" element={<PartsMarketplace />} />
+          <Route path="parts/orders/:orderId" element={<PartsOrderDetail />} />
+          <Route path="parts-shop" element={<PartsShopDashboard />} />
         </Route>
 
         <Route element={<RequireAuth roles={['parts_shop']} />}>
           <Route path="parts-shop" element={<PartsShopDashboard />} />
           <Route path="parts" element={<PartsMarketplace />} />
+          <Route path="parts/orders/:orderId" element={<PartsOrderDetail />} />
         </Route>
 
         <Route element={<RequireAuth roles={['admin']} />}>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/shops" element={<AdminShops />} />
+          <Route path="admin/parts-shops" element={<AdminPartsShops />} />
           <Route path="work-orders" element={<WorkOrders />} />
           <Route path="work-orders/:workOrderId" element={<WorkOrders />} />
+        </Route>
+
+        <Route element={<RequireAuth roles={['admin','support']} />}>
+          <Route path="admin/interviews" element={<InterviewQueue />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

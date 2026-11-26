@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api.js'
 import { serviceLabel } from '../lib/constants.js'
-import { EmptyState, ErrorState, PageSpinner, StatusBadge } from '../components/ui.jsx'
+import { EmptyState, ErrorState, FormError, PageSpinner, StatusBadge } from '../components/ui.jsx'
 import ShopRequestCard from '../components/ShopRequestCard.jsx'
 import ShopWorkOrderCard from '../components/ShopWorkOrderCard.jsx'
 
@@ -13,9 +14,17 @@ const MESSAGES = {
 }
 
 export default function ShopDashboard() {
+  const queryClient = useQueryClient()
   const { data: shop, isPending, error, refetch } = useQuery({
     queryKey: ['shop', 'mine'],
     queryFn: api.shops.mine,
+  })
+  const partsToggle = useMutation({
+    mutationFn: (sellsParts) => api.shops.updateMine({ sellsParts }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shop', 'mine'] })
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
   })
   const requestsQuery = useQuery({
     queryKey: ['shop-requests', shop?.id],
@@ -51,6 +60,30 @@ export default function ShopDashboard() {
       {shop.services?.length > 0 && (
         <p className="mt-6 text-ink-soft">Services: {shop.services.map(serviceLabel).join(', ')}</p>
       )}
+      <section className="card mt-6 p-5">
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            className="mt-1 size-4"
+            checked={Boolean(shop.sells_parts)}
+            disabled={partsToggle.isPending}
+            onChange={(event) => partsToggle.mutate(event.target.checked)}
+          />
+          <span>
+            <strong>I sell parts as well</strong>
+            <span className="mt-1 block text-sm text-ink-soft">
+              Enable a parts catalogue under this same shop account. The parts profile requires its own verification.
+            </span>
+          </span>
+        </label>
+        <FormError>{partsToggle.error?.message}</FormError>
+        {(shop.sells_parts || shop.has_parts_shop_profile) && (
+          <div className="mt-4">
+            {!shop.sells_parts && <p className="mb-2 text-sm text-ink-soft">Parts sales are paused; you can still manage existing orders.</p>}
+            <Link to="/parts-shop" className="btn btn-secondary btn-sm">Manage parts</Link>
+          </div>
+        )}
+      </section>
       <section className="mt-8" aria-labelledby="requests-heading">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

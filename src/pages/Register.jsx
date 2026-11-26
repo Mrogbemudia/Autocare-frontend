@@ -89,7 +89,7 @@ function ShopForm() {
   const signup = useRegister('shop')
   const { register, handleSubmit, setError, formState: { errors } } = useForm({
     resolver: zodResolver(shopRegisterSchema),
-    defaultValues: { service_codes: [], state: '' },
+    defaultValues: { service_codes: [], state: '', sells_parts: false },
   })
   const onSubmit = (values) =>
     signup.mutate({ ...values, certification_notes: values.certification_notes || null }, { onError: (err) => applyFieldErrors(err, setError) })
@@ -130,6 +130,10 @@ function ShopForm() {
       <Field label="Certifications and experience" hint="Optional. An admin reads this when verifying your shop." error={errors.certification_notes?.message}>
         <textarea rows={4} {...register('certification_notes')} />
       </Field>
+      <label className="flex items-start gap-3 text-sm">
+        <input type="checkbox" className="mt-1 size-4" {...register('sells_parts')} />
+        <span><strong>I sell parts as well</strong><span className="mt-1 block text-ink-soft">Create a parts catalogue under this same shop account. Parts sales require separate vendor verification.</span></span>
+      </label>
       <button
         type="submit"
         className="btn w-full bg-[#FACC15] text-[#0F172A] hover:bg-[#EAB308] focus-visible:outline-[#0F172A] focus-visible:ring-2 focus-visible:ring-[#0F172A] focus-visible:ring-offset-2"

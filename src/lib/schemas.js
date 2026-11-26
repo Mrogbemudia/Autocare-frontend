@@ -53,6 +53,7 @@ export const shopRegisterSchema = z
     address: z.string().trim().min(5, 'Enter the shop address').max(200, 'Address is too long'),
     service_codes: z.array(z.enum(SERVICE_TYPES.map((s) => s.code))).min(1, 'Choose at least one service'),
     certification_notes: z.string().trim().max(2000, 'Keep this under 2,000 characters').optional(),
+    sells_parts: z.boolean().default(false),
   })
   .refine(...passwordsMatch)
 

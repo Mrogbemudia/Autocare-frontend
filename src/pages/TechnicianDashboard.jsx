@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api.js'
 import { formatNaira } from '../lib/format.js'
 import { EmptyState, ErrorState, FormError, PageSpinner, StatusBadge } from '../components/ui.jsx'
+import { StartCallButton } from '../components/CallCenter.jsx'
 
 export default function TechnicianDashboard() {
   const qc = useQueryClient()
@@ -12,6 +13,7 @@ export default function TechnicianDashboard() {
   const [attempt,setAttempt] = useState(null)
   const [answers,setAnswers] = useState({})
   const [kind,setKind] = useState('safety')
+  const [assessmentMode,setAssessmentMode] = useState('text')
   const [claimedYears,setClaimedYears] = useState('5')
   const [language,setLanguage] = useState('en')
   const [docType,setDocType] = useState('nin')
@@ -21,6 +23,8 @@ export default function TechnicianDashboard() {
   const start = useMutation({
     mutationFn: () => api.grading.start({
       kind,
+      mode:assessmentMode,
+      language,
       ...(kind === 'experience' ? { claimedYears:Number(claimedYears) } : {}),
     }),
     onSuccess:(paper) => { setAttempt(paper); setAnswers({}) },
@@ -55,8 +59,8 @@ export default function TechnicianDashboard() {
         <p className="mt-1 text-ink-soft">Technician dashboard · <StatusBadge status={data.shop.verification_status} /></p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="card p-5"><p className="text-sm text-sub">Total revenue</p><p className="mt-2 text-2xl font-bold">{formatNaira(data.revenueKobo)}</p></div>
-        <div className="card p-5"><p className="text-sm text-sub">Work in progress</p><p className="mt-2 text-2xl font-bold">{data.jobs.inProgress}</p></div>
+        <div className="card p-5"><p className="text-sm text-sub">Total revenue</p><p className="mt-2 text-2xl font-bold">{formatNaira(data.revenue_kobo)}</p></div>
+        <div className="card p-5"><p className="text-sm text-sub">Work in progress</p><p className="mt-2 text-2xl font-bold">{data.jobs.in_progress}</p></div>
         <div className="card p-5"><p className="text-sm text-sub">Completed jobs</p><p className="mt-2 text-2xl font-bold">{data.completed.total}</p></div>
       </div>
 
@@ -79,6 +83,11 @@ export default function TechnicianDashboard() {
                 <option value="en">English</option><option value="pcm">Nigerian Pidgin</option>
               </select>
             </label>
+            <label className="block text-sm font-semibold">Assessment format
+              <select className="input mt-1.5 font-normal" value={assessmentMode} onChange={(e)=>setAssessmentMode(e.target.value)}>
+                <option value="text">Text</option><option value="audio">Audio-supported</option>
+              </select>
+            </label>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" className="btn btn-primary" disabled={start.isPending} onClick={()=>start.mutate()}>
@@ -89,13 +98,24 @@ export default function TechnicianDashboard() {
             </button>
           </div>
           <FormError>{start.error?.message || submit.error?.message || interview.error?.message}</FormError>
-          {grading.data && <p className="mt-3 text-sm text-ink-soft">Tier: {grading.data.tier} · {grading.data.points} points · Safety gate: {grading.data.safetyGatePassed ? 'passed' : 'pending'}</p>}
+          {grading.error && <ErrorState error={grading.error} onRetry={grading.refetch} />}
+          {grading.data && (
+            <div className="mt-3 space-y-1 text-sm text-ink-soft">
+              <p>Tier: {grading.data.tier} · {grading.data.points} points · Safety gate: {grading.data.safety_gate_passed ? 'passed' : 'pending'}</p>
+              {grading.data.latest_attempts?.map((result) => (
+                <p key={result.kind}>{result.kind}: {result.score_pct}% · {result.passed ? 'passed' : 'not passed'}{result.retake_after ? ` · Retake after ${new Date(result.retake_after).toLocaleString()}` : ''}</p>
+              ))}
+              {grading.error && <p role="alert" className="text-alert">{grading.error.message}</p>}
+              {data.completed.latest_completed && <p>Latest completed job: {new Date(data.completed.latest_completed).toLocaleDateString()}</p>}
+            </div>
+          )}
 
           {attempt && (
             <form className="mt-5 space-y-4" onSubmit={(e)=>{e.preventDefault();submit.mutate()}}>
               {attempt.questions.map((question,index)=>(
                 <fieldset key={question.id} className="rounded-md border border-line p-4">
                   <legend className="px-1 font-semibold">{index+1}. {question.body}</legend>
+                  {question.audio_url && <audio className="mt-2 w-full" controls src={question.audio_url}>Audio playback is not supported by this browser.</audio>}
                   {question.options.map((option,optionIndex)=>(
                     <label key={optionIndex} className="mt-2 flex gap-2 text-sm">
                       <input type="radio" name={question.id} value={optionIndex} checked={answers[question.id]===String(optionIndex)} onChange={()=>setAnswers((old)=>({...old,[question.id]:String(optionIndex)}))} />
@@ -109,9 +129,10 @@ export default function TechnicianDashboard() {
             </button>
             </form>
           )}
+          {interviews.error && <ErrorState error={interviews.error} onRetry={interviews.refetch} />}
           {interviews.data?.length > 0 && (
             <div className="mt-5"><h3 className="font-semibold">Interview requests</h3>
-              <ul className="mt-2 space-y-2">{interviews.data.map((item)=><li key={item.id} className="text-sm"><StatusBadge status={item.status} /> {item.kind} · {item.language}</li>)}</ul>
+              <ul className="mt-2 space-y-2">{interviews.data.map((item)=><li key={item.id} className="flex flex-wrap items-center gap-2 text-sm"><StatusBadge status={item.status} /> {item.kind} · {item.language}{item.scheduled_at&&` · ${new Date(item.scheduled_at).toLocaleString()}`}{item.status==='scheduled'&&item.interviewer_id&&<StartCallButton recipientId={item.interviewer_id} context={{interviewRequestId:item.id}} />}</li>)}</ul>
             </div>
           )}
         </section>

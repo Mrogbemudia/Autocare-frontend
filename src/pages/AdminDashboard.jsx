@@ -28,13 +28,13 @@ export default function AdminDashboard() {
   if (error) return <ErrorState error={error} onRetry={refetch} />
 
   const shops = data?.shops ?? {}
-  const partsShops = data?.partsShops ?? {}
+  const partsShops = data?.parts_shops ?? {}
   const users = data?.users ?? {}
-  const jobs = data?.jobsByStage ?? {}
-  const partsOrders = data?.partsOrders ?? {}
+  const jobs = data?.jobs_by_stage ?? {}
+  const partsOrders = data?.parts_orders ?? {}
   const revenue = data?.revenue ?? {}
-  const pendingShops = data?.pendingShops ?? []
-  const pendingPartsShops = data?.pendingPartsShops ?? []
+  const pendingShops = data?.pending_shops ?? []
+  const pendingPartsShops = data?.pending_parts_shops ?? []
   const maxJobs = Math.max(1,...STAGES.map(([key]) => jobs[key] ?? 0))
 
   return (
@@ -52,8 +52,8 @@ export default function AdminDashboard() {
         <Stat label="Technicians" value={users.shop ?? 0} />
         <Stat label="Parts vendors" value={(partsShops.verified ?? 0) + (partsShops.pending ?? 0)} />
         <Stat label="Active work orders" value={Object.entries(jobs).reduce((total,[key,count]) => key === 'completed' || key === 'cancelled' ? total : total + count,0)} />
-        <Stat label="Paid revenue" value={formatNaira(revenue.paidKobo ?? 0)} />
-        <Stat label="Pending payouts" value={formatNaira(revenue.pendingPayoutKobo ?? 0)} />
+        <Stat label="Paid revenue" value={formatNaira(revenue.paid_kobo ?? 0)} />
+        <Stat label="Pending payouts" value={formatNaira(revenue.pending_payout_kobo ?? 0)} />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -106,7 +106,11 @@ export default function AdminDashboard() {
       <section className="card mt-6" aria-labelledby="pending-verifications">
         <div className="flex items-center justify-between gap-3 border-b border-line p-6">
           <h2 id="pending-verifications" className="text-lg font-semibold">Pending verification reviews</h2>
-          <Link to="/admin/shops" className="text-sm font-semibold underline underline-offset-4">Manage repair shops</Link>
+          <div className="flex gap-4">
+            <Link to="/admin/shops" className="text-sm font-semibold underline underline-offset-4">Manage repair shops</Link>
+            <Link to="/admin/parts-shops" className="text-sm font-semibold underline underline-offset-4">Manage parts vendors</Link>
+            <Link to="/admin/interviews" className="text-sm font-semibold underline underline-offset-4">Interview queue</Link>
+          </div>
         </div>
         {pendingShops.length === 0 && pendingPartsShops.length === 0 ? (
           <p className="p-6 text-sub">No providers are waiting for verification.</p>
@@ -121,7 +125,7 @@ export default function AdminDashboard() {
             {pendingPartsShops.map((shop) => (
               <li key={`parts-${shop.id}`} className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
                 <div><p className="font-semibold">{shop.business_name}</p><p className="text-sm text-sub">Parts shop · {shop.city_area}, {shop.state}</p></div>
-                <span className="rounded-full bg-danfo/25 px-3 py-1 text-xs font-bold">Parts verification needed</span>
+                <Link to="/admin/parts-shops" className="btn btn-secondary btn-sm">Review parts vendor</Link>
               </li>
             ))}
           </ul>

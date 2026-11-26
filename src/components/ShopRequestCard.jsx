@@ -4,6 +4,7 @@ import { api } from '../lib/api.js'
 import { formatDateTime, formatNaira } from '../lib/format.js'
 import { FormError, StatusBadge } from './ui.jsx'
 import RepairMediaGallery from './RepairMediaGallery.jsx'
+import { StartCallButton } from './CallCenter.jsx'
 
 function QuoteForm({ request }) {
   const queryClient = useQueryClient()
@@ -157,6 +158,11 @@ export default function ShopRequestCard({ request }) {
         {request.location_type === 'mobile' ? 'Mobile service' : 'At your shop'}
         {request.service_address ? ` · ${request.service_address}` : ''}
       </p>
+      <StartCallButton
+        recipientId={request.owner_id}
+        context={{ serviceRequestId: request.id }}
+        children="Call owner privately"
+      />
       {request.bookings?.map((booking) => (
         <div key={booking.id} className="space-y-2 rounded-md border border-line p-3">
           <p className="text-sm">

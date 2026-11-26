@@ -6,6 +6,7 @@ import { urgencyLabel } from '../lib/constants.js'
 import { formatDateTime, formatNaira } from '../lib/format.js'
 import { EmptyState, ErrorState, FormError, PageSpinner, StatusBadge } from '../components/ui.jsx'
 import RepairMediaGallery from '../components/RepairMediaGallery.jsx'
+import { StartCallButton } from '../components/CallCenter.jsx'
 
 function earliestAppointmentTime() {
   const nextMinute = new Date(Date.now() + 60_000)
@@ -182,6 +183,10 @@ export default function Requests() {
                     </div>
                     <StatusBadge status={request.status} />
                   </div>
+                    <StartCallButton
+                      recipientId={request.shop_owner_user_id}
+                      context={{ serviceRequestId: request.id }}
+                    />
                   <p>{request.symptoms}</p>
                   <RepairMediaGallery media={request.media} label="Issue media" />
                   {request.bookings?.map((booking) => (

@@ -151,7 +151,6 @@ function asAdminShop(shop) {
     ...shop,
     owner: {
       full_name: shop.owner_name,
-      email: shop.email,
     },
   }
 }
@@ -238,6 +237,14 @@ export const api = {
       const action = { verified: 'verify', rejected: 'reject', suspended: 'suspend' }[status]
       return post(`/admin/shops/${id(shopId)}/${action}`, { note })
     },
+    partsShops: (params) => request('/admin/parts-shops', { params }).then((json) => ({
+      ...json,
+      data: fromApi(json?.data ?? []),
+    })),
+    reviewPartsShop: (shopId, { status, note }) => {
+      const action = { verified: 'verify', rejected: 'reject', suspended: 'suspend' }[status]
+      return post(`/admin/parts-shops/${id(shopId)}/${action}`, { note })
+    },
   },
 
   technician: {
@@ -252,6 +259,9 @@ export const api = {
   interviews: {
     list: () => data(request('/interviews')),
     request: (body) => post('/interviews', body),
+    queue: () => data(request('/interviews/queue')),
+    schedule: (interviewId, scheduledAt) => patch(`/interviews/${id(interviewId)}/schedule`, { scheduledAt }),
+    updateStatus: (interviewId, status) => patch(`/interviews/${id(interviewId)}/status`, { status }),
   },
   documents: {
     submit: (ownerType, body) => data(request(`/verification-documents/${id(ownerType)}`, { method: 'POST', body })),
@@ -276,6 +286,8 @@ export const api = {
     order: (orderId) => data(request(`/parts/orders/${id(orderId)}`)),
     vendorUpdateStatus: (orderId, body) =>
       patch(`/parts-shop/orders/${id(orderId)}/status`, body),
+    updateDeliveryLocation: (orderId, body) =>
+      patch(`/parts-shop/orders/${id(orderId)}/location`, body),
     paystack: (orderId) => post(`/parts/orders/${id(orderId)}/paystack`, {}),
     verifyPaystack: (reference) => post(`/parts/payments/paystack/verify/${id(reference)}`, {}),
     bankTransfer: (orderId) => post(`/parts/orders/${id(orderId)}/bank-transfer`, {}),
@@ -293,6 +305,7 @@ export const api = {
   calls: {
     create: (body) => post('/calls', body),
     incoming: () => data(request('/calls/incoming')),
+    get: (callId) => data(request(`/calls/${id(callId)}`)),
     update: (callId, status) => patch(`/calls/${id(callId)}/status`, { status }),
     signal: (callId, kind, payload) => post(`/calls/${id(callId)}/signals`, { kind, payload }),
     signals: (callId, after) => data(request(`/calls/${id(callId)}/signals`, { params: after ? { after } : {} })),

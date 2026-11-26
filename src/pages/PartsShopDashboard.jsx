@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api.js'
 import { formatNaira } from '../lib/format.js'
 import { EmptyState, ErrorState, FormError, PageSpinner, StatusBadge } from '../components/ui.jsx'
+import { StartCallButton } from '../components/CallCenter.jsx'
 
 export default function PartsShopDashboard() {
   const qc = useQueryClient()
@@ -20,6 +21,7 @@ export default function PartsShopDashboard() {
   const [docType,setDocType] = useState('cac')
   const [docReference,setDocReference] = useState('')
   const [documents,setDocuments] = useState([])
+  const [locationError,setLocationError] = useState('')
 
   const openForm = (part=null) => {
     setEditing(part?.id ?? 'new')
@@ -48,8 +50,27 @@ export default function PartsShopDashboard() {
   })
   const orderStatus = useMutation({
     mutationFn: ({orderId,status}) => api.parts.vendorUpdateStatus(orderId,{status}),
+    onSuccess: () => {
+      qc.invalidateQueries({queryKey:['parts-shop','orders']})
+      qc.invalidateQueries({queryKey:['parts-shop','dashboard']})
+    },
+  })
+  const locationUpdate = useMutation({
+    mutationFn: ({orderId,latitude,longitude}) => api.parts.updateDeliveryLocation(orderId,{latitude,longitude}),
     onSuccess: () => qc.invalidateQueries({queryKey:['parts-shop','orders']}),
   })
+  const shareDeliveryLocation = (orderId) => {
+    setLocationError('')
+    if (!navigator.geolocation) {
+      setLocationError('Location sharing is not available in this browser.')
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      ({coords}) => locationUpdate.mutate({orderId,latitude:coords.latitude,longitude:coords.longitude}),
+      (error) => setLocationError(error.message || 'Could not get your location.'),
+      {enableHighAccuracy:true,timeout:15_000,maximumAge:10_000},
+    )
+  }
 
   if (dashboard.isPending) return <PageSpinner />
   if (dashboard.error) return <ErrorState error={dashboard.error} onRetry={dashboard.refetch} />
@@ -62,7 +83,7 @@ export default function PartsShopDashboard() {
         <p className="mt-1 text-ink-soft">Parts shop dashboard · <StatusBadge status={data.shop.verification_status} /></p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="card p-5"><p className="text-sm text-sub">Total revenue</p><p className="mt-2 text-2xl font-bold">{formatNaira(data.revenueKobo)}</p></div>
+        <div className="card p-5"><p className="text-sm text-sub">Total revenue</p><p className="mt-2 text-2xl font-bold">{formatNaira(data.revenue_kobo)}</p></div>
         <div className="card p-5"><p className="text-sm text-sub">Orders</p><p className="mt-2 text-2xl font-bold">{data.orders.total}</p></div>
         <div className="card p-5"><p className="text-sm text-sub">Open orders</p><p className="mt-2 text-2xl font-bold">{data.orders.open}</p></div>
       </div>
@@ -107,7 +128,10 @@ export default function PartsShopDashboard() {
       <section className="card p-5">
         <h2 className="text-xl">Orders</h2>
         {orders.isPending ? <PageSpinner /> : orders.error ? <ErrorState error={orders.error} onRetry={orders.refetch} /> : orders.data?.length===0 ? <EmptyState title="No orders yet" /> : (
-          <ul className="mt-4 space-y-3">{orders.data.map((order)=><li key={order.id} className="rounded-md border border-line p-4"><div className="flex flex-wrap justify-between gap-3"><div><p className="font-semibold">Order #{order.id.slice(0,8)}</p><p className="text-sm text-ink-soft">{order.fulfilment_type} · {formatNaira(order.total_kobo)}</p></div><StatusBadge status={order.status} /></div><select className="input mt-3 max-w-xs font-normal" value={order.status} onChange={(e)=>orderStatus.mutate({orderId:order.id,status:e.target.value})}><option value="awaiting_payment">Awaiting payment</option><option value="paid">Paid</option><option value="preparing">Preparing</option><option value="ready_for_pickup">Ready for pickup</option><option value="out_for_delivery">Out for delivery</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></li>)}</ul>
+          <>
+            <FormError>{orderStatus.error?.message || locationUpdate.error?.message || locationError}</FormError>
+            <ul className="mt-4 space-y-3">{orders.data.map((order)=><li key={order.id} className="rounded-md border border-line p-4"><div className="flex flex-wrap justify-between gap-3"><div><p className="font-semibold">Order #{order.id.slice(0,8)}</p><p className="text-sm text-ink-soft">{order.fulfilment_type} · {formatNaira(order.total_kobo)}</p></div><StatusBadge status={order.status} /></div><StartCallButton recipientId={order.buyer_id} context={{partsOrderId:order.id}} children="Call buyer privately" /><select className="input mt-3 max-w-xs font-normal" value={order.status} onChange={(e)=>orderStatus.mutate({orderId:order.id,status:e.target.value})}><option value="awaiting_payment">Awaiting payment</option><option value="paid">Paid</option><option value="preparing">Preparing</option>{order.fulfilment_type==='pickup'?<option value="ready_for_pickup">Ready for pickup</option>:<option value="out_for_delivery">Out for delivery</option>}<option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>{order.fulfilment_type==='delivery'&&!['completed','cancelled'].includes(order.status)&&<button type="button" className="btn btn-secondary btn-sm ml-2" disabled={locationUpdate.isPending} onClick={()=>shareDeliveryLocation(order.id)}>{locationUpdate.isPending?'Updating location…':'Share delivery location'}</button>}</li>)}</ul>
+          </>
         )}
       </section>
     </div>

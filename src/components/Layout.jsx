@@ -29,6 +29,9 @@ const NAV = {
     ['/work-orders', 'Work orders'],
     ['/shops', 'Browse shops'],
   ],
+  support: [
+    ['/admin/interviews', 'Interview queue'],
+  ],
 }
 const GUEST_NAV = [['/shops', 'Find a shop']]
 
@@ -50,7 +53,7 @@ export default function Layout() {
       </a>
 
       {/* The danfo band: the one loud thing on the page. */}
-      <header className="border-b-[6px] border-slate-950 bg-[#FACC15] text-slate-950">
+      <header className="border-b-[6px] border-slate-950 bg-danfo text-slate-950">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" onClick={close} className="inline-flex items-center gap-2.5 font-display text-3xl font-extrabold tracking-tight">
             <span aria-hidden="true" className="grid size-9 place-items-center rounded-sm bg-ink text-xl text-danfo">K</span>

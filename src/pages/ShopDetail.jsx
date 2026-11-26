@@ -5,6 +5,7 @@ import { useMe } from '../lib/auth.js'
 import { mapsLink } from '../lib/format.js'
 import { serviceLabel } from '../lib/constants.js'
 import { EmptyState, ErrorState, PageSpinner, VerifiedBadge } from '../components/ui.jsx'
+import { StartCallButton } from '../components/CallCenter.jsx'
 
 export default function ShopDetail() {
   const { shopId } = useParams()
@@ -57,6 +58,9 @@ export default function ShopDetail() {
 
       <aside className="card h-fit space-y-5 p-5">
         {cta}
+        {user?.role === 'owner' && (
+          <StartCallButton recipientId={shop.owner_user_id} context={{ shopId: shop.id }} />
+        )}
         <div>
           <h2 className="text-base">Address</h2>
           <p className="mt-1">{shop.address}</p>

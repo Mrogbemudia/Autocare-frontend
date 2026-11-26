@@ -14,7 +14,8 @@ const queryClient = new QueryClient({
       // Retry only server/network failures (status 0 = cannot reach the server,
       // e.g. a free-tier backend that is still waking up). Never retry 4xx.
       retry: (failureCount, error) =>
-        (error?.status === 0 || error?.status >= 500) && failureCount < 2,
+        error?.status === 0 && failureCount < 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 })
